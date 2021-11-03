@@ -1,0 +1,144 @@
+======================================================
+						GİRİŞ
+		
+	Angular yapısı temel anlamıyla komponentlerden oluşur.
+	Componentler birbirleri ile iletişim kurabilirler.
+	Bir de servis yapısı vardır. Componentlere data sağlar. API ile haberleşebilir.
+	Component ve servislerin toplamı modülü oluşturur.
+	Ugulama root modülde çalışır.
+
+	Bir componentin component olarak tanımlanması için,  başında @Component{()} tanımlamasaı olmalıdır.
+	Bunun içinde selector, templateUrl ve styleUrls tanımlanır.
+	
+	=====================================================
+						BINDING
+						
+	One way binding, datayı html'e taşımak, readonly binding
+	Two way binding, html ve servis arasındaki karşılıklı data akışıdır.
+	
+	=====================================================
+						PAKET YÖNETİMİ
+						
+    package.json içinde kulanılan paketleri gösterir.
+	dependencies altında proje için gerekli olan dependencieler, devDependencies içinde is 
+	geliştirim için gerekli olan dependenciesler yer alır
+	
+	style.css global css dosyasıdır
+	
+	=====================================================
+						BUILT IN PİPE
+						
+	Ekrandaki datanın bizim istediğimiz şekilde değiştirilmesi
+	{{prodcut.name | uppercase}} büyük harfle yaz gibi
+	{{product.price | currency}} para birimi
+	{{product.price | currency:'USD':true:"1.2-2"}}  usd'nin sembol kullanımı true, formatı da 1.2 şeklinde virgülden sonra da 2 basamak gösterir
+	
+	======================================================
+						CUSTOM PİPE
+						
+	pipe oluşturmak isetiğimiz modül altında locate olduktan sonran
+	ng g pipe ProductFilter (pipeAdı) komutuyla birlikte pipe oluşturuyoruz 
+	
+	======================================================
+						TWO WAY BİNDİNG
+						
+	 [(ngModel)]="filterText"
+	 app.module.ts içerisine import { FormsModule } from '@angular/forms';
+	 tanımlanmalıdır. imports altına da FormsModule eklenmelidir.
+	 
+	 =====================================================
+						EVENT BİNDİNG
+						
+	clas içerisine metod yazlıp, evente atanabilir (click)="metod(parametre)"
+	
+	======================================================
+						SERVİSLER
+	servis klasörü oluşturulup ng g service servisadı ile servis classı ollşturulur
+	Servisin servis olabilmesi için @Injectible olması gerekli 
+	providedIn:'root' ise globaldir
+	
+	======================================================
+			LOKAL SERVİSLER ve DEPENDENCY INJECTION
+	
+	Global servislerin örneği proje ayağa kalkar kalmaz oluşturulur.
+	Lokal servisler için ise, ilgili component sadece çağırıldığında oluşur
+	ts dosyaları içinde @Component altnında providers içinde servisler tanımlanır.
+	constructor içinde private xSerice:XServise tanımlaması ypaıldığında
+	otomatikD I çalışır. eğer Xservise global bir serivsee hazır oluşturulmuş
+	instance alınırken, global bir servis ise yeni instance oluşturulur 
+	
+	=======================================================
+						HTTP CLIENT MODULE
+						
+	appmodule.ts içerisine import {HttpClientModule} from '@angular/common/http';
+    eildikten sonra importsa tanımlama gerçekleştirilir
+	
+	=======================================================
+						OBSERVABLE MİMARİ
+						
+	getProducts():Observable<Product[]>{
+    return  this.httpClient.get<Product[]>(this.path);
+  }
+     getProducts metodunu çağıran bir metod buna subscribe olabilir.
+	 
+	 observable mimaride yolda data giderken baikası da buna subscribe olsun?
+	 this.httpClient.get<Product[]>(this.path).pipe( tap(), catchError())
+	 
+	 pipe içerisinde tap ve catchError diye 2 tane metod var.
+	 atılan request esnasında akan data üzerinde ilem yaparız.
+	 
+	 =======================================================
+							ROUTE
+							
+	app-routing.module.ts içerisine routelar tanımlanır.
+	
+	=========================================================
+					FORMLARLA ÇALIŞMAK - 1 KLASİK FORM 
+					
+	<form #productAddForm = "ngForm" (ngsubmit) = "add(productAddForm)">
+
+    </form>   forma isim verdik
+	
+	(ngsubmit) = "add(productAddForm)"  ile add operasyonuna bağladık submit işlemi için
+	
+	**Bir input elementinde olabilecek angular ifadeler
+			- pristine (ilk açıldı hiçbişey yapılmadı)
+			- dirty (input içine bişeyler yazıldı ama silindi)
+			- touch  (inputa focus oldu ama hiçbişey yazmadı)
+			
+	<div *ngIf="name.invalid&&name.dirty"></div>  ismi name olan input invalidse ve dirty ise çalışacak div
+	
+	==========================================================
+					FORMLARLA ÇALIŞMAK - 2 REACTIVE FORMS
+					
+	import { FormBuilder } from '@angular/forms'; aldıntdaki Form Builder 
+	nesnesi, constructor içine implement edilir.
+	
+	  productAddForm!: FormGroup;  proppertysi tanımlanır
+	  
+	  createProductAddForm(){
+    this.productAddForm = this.formBuilder.group({
+      name: ["",Validators.required],
+      description: ["",Validators.required],
+      imageUrl: ["",Validators.required],
+      price: ["",Validators.required],
+      categoryId: ["",Validators.required],
+    });
+  }  bu metod formumuzdaki alanların doğrudan yazıldığı ve 
+  doğrulama işlemlerinin yapıldığı yerdir.
+  
+  add(){
+    if(this.productAddForm.valid){
+      this.product = Object.assign({}, this.productAddForm.value)
+    }
+  }  tanımlamış olduğumuz prodcut nesnemize, formun değerleri
+  assign edilir. 
+  
+  <form [formGroup] = "productAddForm" (ngSubmit)="add()"  class="form-group">
+
+    
+   </form> 
+
+
+	
+							
